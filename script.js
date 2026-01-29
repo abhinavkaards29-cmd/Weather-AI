@@ -1,6 +1,5 @@
-
-const API_KEY = "fab9b6d2db473ddcfb43b90e080ca8ee"; // keep your real key
-  const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
+const API_KEY = "fab9b6d2db473ddcfb43b90e080ca8ee";
+const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("JS loaded");
@@ -20,11 +19,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const query = input.value.trim();
         if (!query) {
           showStatus("Enter area / city / country");
+          busy = false;
           return;
         }
 
         showStatus("Searching weather...");
-        await fetchWeatherByQuery(query); // your existing function
+        await fetchWeatherByQuery(query);
       } catch (err) {
         console.error(err);
         showStatus("Weather error");
@@ -40,8 +40,8 @@ document.addEventListener("DOMContentLoaded", () => {
       busy = true;
 
       try {
-        showStatus("Getting location...");
-        await fetchWeatherByLocation(); // your existing function
+        showStatus("Getting your location...");
+        await fetchWeatherByLocation();
       } catch (err) {
         console.error(err);
         showStatus("Location error");
@@ -51,12 +51,3 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-
-function showStatus(msg) {
-  const status = document.getElementById("status");
-  if (status) {
-    status.innerText = msg;
-    status.style.opacity = "1";
-  }
-}
-  
