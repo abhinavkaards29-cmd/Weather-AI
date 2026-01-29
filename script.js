@@ -4,7 +4,7 @@ const saveFavBtn = document.getElementById("saveFavBtn");
 const favoritesDiv = document.getElementById("favorites");
 
 const hourlyDiv = document.getElementById("hourlyForecast");
-
+let lastWeatherData = null;
 let lastSearchQuery = "";
 const cityInput = document.getElementById("cityInput");
 const searchBtn = document.getElementById("searchBtn");
