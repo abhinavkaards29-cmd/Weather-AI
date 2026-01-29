@@ -1,55 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Weather Glass Pro</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather Glass</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#020617">
 </head>
 
 <body>
-  <main class="glass">
+<div class="rain"></div>
 
-    <header>
-      <h1>🌤 Weather Glass</h1>
-      <p class="subtitle">City • State • Country • Area</p>
-    </header>
+<main class="glass">
+  <h1>☁️ Weather Glass</h1>
 
-    <!-- SEARCH -->
-    <div class="search-box">
-      <input id="locationInput" placeholder="Enter city, area, state, country" />
-      <button id="searchBtn">Search</button>
-    </div>
+  <input id="cityInput" placeholder="City / Area / Country">
+  <button id="searchBtn">Search</button>
+  <button id="locBtn">📍 Use My Location</button>
 
-    <!-- CURRENT WEATHER -->
-    <section id="current" class="card hidden">
-      <h2 id="place"></h2>
-      <div class="temp" id="temp"></div>
-      <p id="desc"></p>
+  <section id="current" class="hidden">
+    <h2 id="place"></h2>
+    <div id="temp"></div>
+    <p id="desc"></p>
+    <p id="extra"></p>
+    <button id="voiceBtn">🔊 Speak Weather</button>
+  </section>
 
-      <div class="stats">
-        <span id="feels"></span>
-        <span id="humidity"></span>
-        <span id="wind"></span>
-      </div>
+  <section id="dailyBox" class="hidden">
+    <h3>📅 7-Day Forecast</h3>
+    <div id="daily"></div>
+  </section>
 
-      <button id="voiceBtn">🔊 Speak Weather</button>
-    </section>
+  <section id="mapBox" class="hidden">
+    <h3>📍 Location</h3>
+    <iframe id="map" loading="lazy"></iframe>
+  </section>
 
-    <!-- FORECAST -->
-    <section id="forecast" class="card hidden">
-      <h3>7-Day Forecast</h3>
-      <div id="forecastList"></div>
-    </section>
+  <button id="installBtn" class="hidden">⬇️ Install App</button>
+</main>
 
-    <!-- MAP -->
-    <section id="mapBox" class="card hidden">
-      <h3>Location Map</h3>
-      <iframe id="map"></iframe>
-    </section>
-
-  </main>
-
-  <script src="script.js" defer></script>
+<script src="script.js"></script>
 </body>
 </html>
