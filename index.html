@@ -2,43 +2,50 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Weather Glass</title>
+
   <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
 </head>
-
 <body>
-  <main class="glass">
 
-    <h1>☁️ Weather Glass</h1>
+<main class="app">
+  <h1>☁️ Weather Glass</h1>
 
-    <!-- SEARCH -->
-    <input id="cityInput" placeholder="Search city" />
-    <button id="searchBtn">Search</button>
+  <input id="cityInput" placeholder="Search city" />
+  <button id="searchBtn">Search</button>
 
-    <!-- CURRENT -->
-    <section id="current" class="card hidden">
-      <h2 id="place"></h2>
-      <div id="temp"></div>
-      <p id="desc"></p>
-      <p id="extra"></p>
-    </section>
+  <section id="current" class="card hidden">
+    <h2 id="place"></h2>
+    <div id="temp"></div>
+    <p id="desc"></p>
+    <p id="extra"></p>
+  </section>
 
-    <!-- 7 DAY -->
-    <section id="daily" class="card hidden">
-      <h3>📅 7-Day Forecast</h3>
-      <div id="dailyList"></div>
-    </section>
+  <section id="daily" class="card hidden">
+    <h3>📅 7-Day Forecast</h3>
+    <div id="dailyList"></div>
+  </section>
 
-    <!-- MAP -->
-    <section id="mapBox" class="card hidden">
-      <h3>📍 Location</h3>
-      <iframe id="map" loading="lazy"></iframe>
-    </section>
+  <section id="mapBox" class="card hidden">
+    <h3>📍 Location</h3>
+    <iframe id="map" loading="lazy"></iframe>
+  </section>
 
-  </main>
+  <div class="actions">
+    <button id="favBtn">⭐ Favourite</button>
+    <button id="remBtn">⏰ Reminder</button>
+  </div>
+</main>
 
-  <!-- SCRIPT MUST BE LAST -->
-  <script src="script.js"></script>
+<script src="script.js"></script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+
 </body>
 </html>
