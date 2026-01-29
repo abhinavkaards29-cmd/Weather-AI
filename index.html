@@ -2,18 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Weather Glass</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
+  <title>Weather Glass</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-
   <main class="glass">
+
     <h1>☁️ Weather Glass</h1>
 
+    <!-- SEARCH -->
     <input id="cityInput" placeholder="Search city" />
     <button id="searchBtn">Search</button>
 
@@ -25,19 +24,21 @@
       <p id="extra"></p>
     </section>
 
-    <!-- FORECAST -->
-    <section id="forecast" class="card hidden">
-      <h3>7-Day Forecast</h3>
-      <div id="days"></div>
+    <!-- 7 DAY -->
+    <section id="daily" class="card hidden">
+      <h3>📅 7-Day Forecast</h3>
+      <div id="dailyList"></div>
     </section>
 
     <!-- MAP -->
     <section id="mapBox" class="card hidden">
-      <h3>Location</h3>
-      <iframe id="map"></iframe>
+      <h3>📍 Location</h3>
+      <iframe id="map" loading="lazy"></iframe>
     </section>
+
   </main>
 
+  <!-- SCRIPT MUST BE LAST -->
   <script src="script.js"></script>
 </body>
 </html>
