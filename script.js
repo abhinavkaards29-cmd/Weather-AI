@@ -1,5 +1,9 @@
 const API_KEY = "fab9b6d2db473ddcfb43b90e080ca8ee";
 
+const saveFavBtn = document.getElementById("saveFavBtn");
+const favoritesDiv = document.getElementById("favorites");
+
+let lastSearchQuery = "";
 const cityInput = document.getElementById("cityInput");
 const searchBtn = document.getElementById("searchBtn");
 const locBtn = document.getElementById("locBtn");
@@ -38,7 +42,9 @@ async function searchByCoords(lat, lon) {
   const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
   const res = await fetch(url);
   const data = await res.json();
-
+  
+localStorage.setItem("lastLocation", `${lat},${lon}`);
+  
   renderWeather(data);
   reverseGeocode(lat, lon);
   loadMap(lat, lon);
