@@ -2,50 +2,54 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Weather Glass</title>
-
+  <title>Weather Glass Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
-  <link rel="manifest" href="manifest.json" />
 </head>
+
 <body>
+  <main class="glass">
 
-<main class="app">
-  <h1>☁️ Weather Glass</h1>
+    <header>
+      <h1>🌤 Weather Glass</h1>
+      <p class="subtitle">City • State • Country • Area</p>
+    </header>
 
-  <input id="cityInput" placeholder="Search city" />
-  <button id="searchBtn">Search</button>
+    <!-- SEARCH -->
+    <div class="search-box">
+      <input id="locationInput" placeholder="Enter city, area, state, country" />
+      <button id="searchBtn">Search</button>
+    </div>
 
-  <section id="current" class="card hidden">
-    <h2 id="place"></h2>
-    <div id="temp"></div>
-    <p id="desc"></p>
-    <p id="extra"></p>
-  </section>
+    <!-- CURRENT WEATHER -->
+    <section id="current" class="card hidden">
+      <h2 id="place"></h2>
+      <div class="temp" id="temp"></div>
+      <p id="desc"></p>
 
-  <section id="daily" class="card hidden">
-    <h3>📅 7-Day Forecast</h3>
-    <div id="dailyList"></div>
-  </section>
+      <div class="stats">
+        <span id="feels"></span>
+        <span id="humidity"></span>
+        <span id="wind"></span>
+      </div>
 
-  <section id="mapBox" class="card hidden">
-    <h3>📍 Location</h3>
-    <iframe id="map" loading="lazy"></iframe>
-  </section>
+      <button id="voiceBtn">🔊 Speak Weather</button>
+    </section>
 
-  <div class="actions">
-    <button id="favBtn">⭐ Favourite</button>
-    <button id="remBtn">⏰ Reminder</button>
-  </div>
-</main>
+    <!-- FORECAST -->
+    <section id="forecast" class="card hidden">
+      <h3>7-Day Forecast</h3>
+      <div id="forecastList"></div>
+    </section>
 
-<script src="script.js"></script>
+    <!-- MAP -->
+    <section id="mapBox" class="card hidden">
+      <h3>Location Map</h3>
+      <iframe id="map"></iframe>
+    </section>
 
-<script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
-}
-</script>
+  </main>
 
+  <script src="script.js" defer></script>
 </body>
 </html>
