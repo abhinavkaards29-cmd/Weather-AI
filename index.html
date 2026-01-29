@@ -1,46 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Weather Glass</title>
 
-<link rel="stylesheet" href="style.css">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#020617">
+<link rel="stylesheet" href="style.css">
+
 </head>
-
 <body>
-<div class="rain"></div>
 
-<main class="glass">
+<div class="app glass">
   <h1>☁️ Weather Glass</h1>
 
   <input id="cityInput" placeholder="City / Area / Country">
   <button id="searchBtn">Search</button>
   <button id="locBtn">📍 Use My Location</button>
 
-  <section id="current" class="hidden">
+  <div id="weatherBox" class="hidden">
     <h2 id="place"></h2>
-    <div id="temp"></div>
+    <h1 id="temp"></h1>
     <p id="desc"></p>
     <p id="extra"></p>
+
     <button id="voiceBtn">🔊 Speak Weather</button>
-  </section>
+  </div>
 
-  <section id="dailyBox" class="hidden">
-    <h3>📅 7-Day Forecast</h3>
-    <div id="daily"></div>
-  </section>
+  <div id="forecast"></div>
 
-  <section id="mapBox" class="hidden">
-    <h3>📍 Location</h3>
-    <iframe id="map" loading="lazy"></iframe>
-  </section>
-
-  <button id="installBtn" class="hidden">⬇️ Install App</button>
-</main>
+  <iframe id="map"
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade">
+  </iframe>
+</div>
 
 <script src="script.js"></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js");
+  }
+</script>
+
 </body>
 </html>
