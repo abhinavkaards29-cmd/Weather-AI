@@ -1,46 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Weather Glass</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather Area Search</title>
 
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 
+  <!-- Leaflet Map -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
 </head>
+
 <body>
+  <div class="app">
+    <h1>🌍 Weather</h1>
 
-<div class="app glass">
-  <h1>☁️ Weather Glass</h1>
+    <input id="cityInput" placeholder="Area / City / Country" />
+    <button id="searchBtn">Search</button>
+    <button id="locBtn">📍 My Location</button>
 
-  <input id="cityInput" placeholder="City / Area / Country">
-  <button id="searchBtn">Search</button>
-  <button id="locBtn">📍 Use My Location</button>
+    <div id="weatherCard" class="hidden">
+      <h2 id="placeName"></h2>
+      <h1 id="temp"></h1>
+      <p id="desc"></p>
+      <p id="extra"></p>
+    </div>
 
-  <div id="weatherBox" class="hidden">
-    <h2 id="place"></h2>
-    <h1 id="temp"></h1>
-    <p id="desc"></p>
-    <p id="extra"></p>
-
-    <button id="voiceBtn">🔊 Speak Weather</button>
+    <div id="map"></div>
   </div>
 
-  <div id="forecast"></div>
-
-  <iframe id="map"
-    loading="lazy"
-    referrerpolicy="no-referrer-when-downgrade">
-  </iframe>
-</div>
-
-<script src="script.js"></script>
-<script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js");
-  }
-</script>
-
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
