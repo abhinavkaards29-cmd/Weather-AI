@@ -3,6 +3,8 @@ const API_KEY = "fab9b6d2db473ddcfb43b90e080ca8ee";
 const saveFavBtn = document.getElementById("saveFavBtn");
 const favoritesDiv = document.getElementById("favorites");
 
+const hourlyDiv = document.getElementById("hourlyForecast");
+
 let lastSearchQuery = "";
 const cityInput = document.getElementById("cityInput");
 const searchBtn = document.getElementById("searchBtn");
@@ -98,4 +100,29 @@ function loadMap(lat, lon) {
     map.setView([lat, lon], 12);
     marker.setLatLng([lat, lon]);
   }
+}
+
+async function loadHourlyForecast(lat, lon) {
+  const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
+  const res = await fetch(url);
+  const data = await res.json();
+
+  hourlyDiv.innerHTML = "";
+
+  // Next 6 forecasts (3-hour interval → next ~18 hours)
+  data.list.slice(0, 6).forEach(item => {
+    const time = new Date(item.dt * 1000).getHours();
+    const temp = Math.round(item.main.temp);
+    const cond = item.weather[0].main;
+
+    const div = document.createElement("div");
+    div.className = "hour-card";
+    div.innerHTML = `
+      <strong>${time}:00</strong>
+      <span>${temp}°C</span>
+      <span>${cond}</span>
+    `;
+
+    hourlyDiv.appendChild(div);
+  });
 }
