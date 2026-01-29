@@ -191,4 +191,4 @@ async function loadHourlyForecast(lat, lon) {
 
     hourlyDiv.appendChild(div);
   });
-}
+
