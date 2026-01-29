@@ -4,42 +4,44 @@
 }
 
 body {
-  margin: 0;
+  background: radial-gradient(#0f2027, #203a43, #2c5364);
   min-height: 100vh;
-  background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  place-items: center;
+  margin: 0;
 }
 
 .glass {
-  width: 340px;
+  width: 360px;
   padding: 20px;
-  border-radius: 18px;
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(18px);
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
   color: white;
+}
+
+h1, h2, h3 {
   text-align: center;
 }
 
 input, button {
   width: 100%;
-  padding: 12px;
+  padding: 10px;
   margin-top: 10px;
-  border-radius: 12px;
+  border-radius: 10px;
   border: none;
 }
 
 button {
-  background: #ffffffcc;
   cursor: pointer;
+  background: #ffffffcc;
 }
 
 .card {
-  margin-top: 16px;
-  padding: 12px;
-  border-radius: 14px;
+  margin-top: 15px;
+  padding: 15px;
   background: rgba(255,255,255,0.12);
+  border-radius: 15px;
 }
 
 .hidden {
@@ -47,18 +49,19 @@ button {
 }
 
 #temp {
-  font-size: 40px;
-  font-weight: bold;
+  font-size: 42px;
+  text-align: center;
 }
 
-#days div {
-  margin: 6px 0;
-  font-size: 14px;
-}
-
-iframe {
+#map {
   width: 100%;
-  height: 200px;
-  border: 0;
+  height: 220px;
+  border: none;
   border-radius: 12px;
+}
+
+#dailyList div {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
 }
