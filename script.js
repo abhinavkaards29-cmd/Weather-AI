@@ -24,6 +24,33 @@ locBtn.onclick = () =>
     searchByCoords(p.coords.latitude, p.coords.longitude)
   );
 
+document.getElementById("aiBtn").onclick = () => {
+  if (!lastWeatherData) return;
+
+  const t = lastWeatherData.main.temp;
+  const h = lastWeatherData.main.humidity;
+  const w = lastWeatherData.wind.speed;
+  const d = lastWeatherData.weather[0].description;
+
+  let msg = `Current weather shows ${d}. `;
+
+  if (t < 10) msg += "It is cold, wear warm clothes. ";
+  else if (t < 20) msg += "The weather is cool and comfortable. ";
+  else if (t < 30) msg += "It feels warm, light clothing is ideal. ";
+  else msg += "It is very hot, stay hydrated and avoid sun exposure. ";
+
+  if (h > 70) msg += "High humidity may cause discomfort. ";
+  else msg += "Humidity levels are comfortable. ";
+
+  if (w > 8) msg += "Windy conditions may affect travel. ";
+  else msg += "Winds are calm. ";
+
+  msg += "Overall, outdoor activity is ";
+  msg += (t > 35 || h > 80) ? "not recommended for long periods." : "generally safe.";
+
+  document.getElementById("aiText").textContent = msg;
+  document.getElementById("aiBox").classList.remove("hidden");
+};
 // 🌦 WEATHER BY CITY / AREA
 async function searchCity() {
   const input = document.getElementById("cityInput").value.trim();
