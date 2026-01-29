@@ -65,7 +65,7 @@ async function loadWeather(city) {
       `;
     });
 
-    dailyBox.classList.remove("hidden");
+    dailyBox.style.display = "block";
 
   } catch (err) {
     alert(err.message);
