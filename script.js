@@ -1,85 +1,90 @@
 const API_KEY = "21c37b3cf3fc437adbbab13394d14186";
 
-const input = document.getElementById("locationInput");
+const cityInput = document.getElementById("cityInput");
 const searchBtn = document.getElementById("searchBtn");
+const locBtn = document.getElementById("locBtn");
 const voiceBtn = document.getElementById("voiceBtn");
+const installBtn = document.getElementById("installBtn");
 
-const current = document.getElementById("current");
-const forecast = document.getElementById("forecast");
-const mapBox = document.getElementById("mapBox");
+searchBtn.addEventListener("click", searchCity);
+locBtn.addEventListener("click", useLocation);
+voiceBtn.addEventListener("click", speakWeather);
 
-const placeEl = document.getElementById("place");
-const tempEl = document.getElementById("temp");
-const descEl = document.getElementById("desc");
-const feelsEl = document.getElementById("feels");
-const humidityEl = document.getElementById("humidity");
-const windEl = document.getElementById("wind");
+async function searchCity() {
+  const city = cityInput.value.trim();
+  if (!city) return alert("Enter a location");
 
-const forecastList = document.getElementById("forecastList");
-const map = document.getElementById("map");
+  const geo = await fetch(
+    `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${API_KEY}`
+  ).then(r => r.json());
 
-let spokenText = "";
+  if (!geo[0]) return alert("Location not found");
 
-searchBtn.addEventListener("click", () => {
-  const q = input.value.trim();
-  if (!q) return alert("Enter a location");
-  loadWeather(q);
+  loadWeather(geo[0].lat, geo[0].lon, geo[0].name, geo[0].country);
+}
+
+function useLocation() {
+  navigator.geolocation.getCurrentPosition(
+    pos => loadWeather(pos.coords.latitude, pos.coords.longitude, "Your Location", ""),
+    () => alert("Location permission denied")
+  );
+}
+
+async function loadWeather(lat, lon, name, country) {
+  const data = await fetch(
+    `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
+  ).then(r => r.json());
+
+  if (!data.current) return alert("Weather error");
+
+  document.getElementById("current").classList.remove("hidden");
+  document.getElementById("place").innerText = `${name} ${country}`;
+  document.getElementById("temp").innerText = Math.round(data.current.temp) + "°C";
+  document.getElementById("desc").innerText = data.current.weather[0].description;
+  document.getElementById("extra").innerText =
+    `Humidity ${data.current.humidity}% • Wind ${data.current.wind_speed} m/s`;
+
+  // 7-DAY
+  const daily = document.getElementById("daily");
+  daily.innerHTML = "";
+  data.daily.slice(1, 8).forEach(d => {
+    const el = document.createElement("div");
+    el.className = "day";
+    el.innerHTML = `
+      <div>${new Date(d.dt * 1000).toLocaleDateString("en",{weekday:"short"})}</div>
+      <strong>${Math.round(d.temp.day)}°</strong>
+    `;
+    daily.appendChild(el);
+  });
+  document.getElementById("dailyBox").classList.remove("hidden");
+
+  // MAP (SAFE)
+  document.getElementById("map").src =
+    `https://maps.google.com/maps?q=${lat},${lon}&z=10&output=embed`;
+  document.getElementById("mapBox").classList.remove("hidden");
+}
+
+// 🔊 VOICE WEATHER
+function speakWeather() {
+  const text =
+    `${place.innerText}. Temperature ${temp.innerText}. ${desc.innerText}`;
+  speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+}
+
+// 📦 PWA INSTALL
+let deferredPrompt;
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.classList.remove("hidden");
 });
 
-voiceBtn.addEventListener("click", () => {
-  if (!spokenText) return;
-  const utter = new SpeechSynthesisUtterance(spokenText);
-  speechSynthesis.speak(utter);
+installBtn.addEventListener("click", async () => {
+  deferredPrompt.prompt();
+  deferredPrompt = null;
 });
 
-async function loadWeather(query) {
-  try {
-    // GEOCODING (city / area / state / country)
-    const geo = await fetch(
-      `https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=1&appid=${API_KEY}`
-    ).then(r => r.json());
-
-    if (!geo[0]) throw new Error("Location not found");
-
-    const { lat, lon, name, state, country } = geo[0];
-
-    // WEATHER
-    const data = await fetch(
-      `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=metric&exclude=minutely,hourly,alerts&appid=${API_KEY}`
-    ).then(r => r.json());
-
-    placeEl.textContent =
-      `${name}${state ? ", " + state : ""}, ${country}`;
-    tempEl.textContent = `${Math.round(data.current.temp)}°C`;
-    descEl.textContent = data.current.weather[0].description;
-    feelsEl.textContent = `Feels ${data.current.feels_like}°C`;
-    humidityEl.textContent = `Humidity ${data.current.humidity}%`;
-    windEl.textContent = `Wind ${data.current.wind_speed} m/s`;
-
-    spokenText = `Weather in ${name}. Temperature ${Math.round(
-      data.current.temp
-    )} degrees. ${data.current.weather[0].description}.`;
-
-    current.classList.remove("hidden");
-
-    // FORECAST
-    forecastList.innerHTML = "";
-    data.daily.slice(0, 7).forEach(d => {
-      const day = new Date(d.dt * 1000).toDateString().slice(0, 10);
-      const div = document.createElement("div");
-      div.innerHTML = `<span>${day}</span><span>${Math.round(
-        d.temp.day
-      )}°C</span>`;
-      forecastList.appendChild(div);
-    });
-    forecast.classList.remove("hidden");
-
-    // MAP
-    map.src =
-      `https://maps.google.com/maps?q=${lat},${lon}&z=11&output=embed`;
-    mapBox.classList.remove("hidden");
-
-  } catch (e) {
-    alert(e.message);
-  }
+// SERVICE WORKER
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
 }
