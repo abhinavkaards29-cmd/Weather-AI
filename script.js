@@ -25,7 +25,15 @@ locBtn.onclick = () =>
     searchByCoords(p.coords.latitude, p.coords.longitude)
   );
 
-document.getElementById("aiBtn").onclick = () => {
+const aiBtn = document.getElementById("aiBtn");
+
+if (aiBtn) {
+  aiBtn.onclick = () => {
+    if (!lastWeatherData) return;
+    // existing AI logic
+  };
+}
+
   if (!lastWeatherData) return;
 
   const t = lastWeatherData.main.temp;
