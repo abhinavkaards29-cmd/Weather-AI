@@ -73,3 +73,30 @@ button:hover {
   padding: 8px 14px;
   white-space: nowrap;
 }
+
+.section-title {
+  margin-top: 18px;
+  font-size: 18px;
+}
+
+.hourly {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  margin-top: 10px;
+}
+
+.hour-card {
+  min-width: 90px;
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.hour-card span {
+  display: block;
+  font-size: 14px;
+  opacity: 0.9;
+}
