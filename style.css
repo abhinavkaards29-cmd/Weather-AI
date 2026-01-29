@@ -19,10 +19,13 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-.app {
+.app,
+.container {
   max-width: 420px;
   margin: auto;
   padding: 16px;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 h1 {
