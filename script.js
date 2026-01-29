@@ -1,90 +1,75 @@
 const API_KEY = "fab9b6d2db473ddcfb43b90e080ca8ee";
 
-const cityInput = document.getElementById("cityInput");
 const searchBtn = document.getElementById("searchBtn");
 const locBtn = document.getElementById("locBtn");
 const voiceBtn = document.getElementById("voiceBtn");
-const installBtn = document.getElementById("installBtn");
 
-searchBtn.addEventListener("click", searchCity);
-locBtn.addEventListener("click", useLocation);
-voiceBtn.addEventListener("click", speakWeather);
+searchBtn.onclick = () => getCityWeather();
+locBtn.onclick = () => navigator.geolocation.getCurrentPosition(getGeoWeather);
 
-async function searchCity() {
+async function getCityWeather() {
   const city = cityInput.value.trim();
-  if (!city) return alert("Enter a location");
-
-  const geo = await fetch(
-    `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${API_KEY}`
-  ).then(r => r.json());
-
-  if (!geo[0]) return alert("Location not found");
-
-  loadWeather(geo[0].lat, geo[0].lon, geo[0].name, geo[0].country);
+  if (!city) return alert("Enter a city");
+  fetchWeather(`q=${city}`);
 }
 
-function useLocation() {
-  navigator.geolocation.getCurrentPosition(
-    pos => loadWeather(pos.coords.latitude, pos.coords.longitude, "Your Location", ""),
-    () => alert("Location permission denied")
-  );
+function getGeoWeather(pos) {
+  fetchWeather(`lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
 }
 
-async function loadWeather(lat, lon, name, country) {
-  const data = await fetch(
-    `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
-  ).then(r => r.json());
+async function fetchWeather(query) {
+  try {
+    const res = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?${query}&units=metric&appid=${API_KEY}`
+    );
+    const data = await res.json();
 
-  if (!data.current) return alert("Weather error");
+    if (!data.main) throw "Invalid weather data";
 
-  document.getElementById("current").classList.remove("hidden");
-  document.getElementById("place").innerText = `${name} ${country}`;
-  document.getElementById("temp").innerText = Math.round(data.current.temp) + "°C";
-  document.getElementById("desc").innerText = data.current.weather[0].description;
-  document.getElementById("extra").innerText =
-    `Humidity ${data.current.humidity}% • Wind ${data.current.wind_speed} m/s`;
+    showWeather(data);
+    loadForecast(data.coord.lat, data.coord.lon);
+    loadMap(data.coord.lat, data.coord.lon);
 
-  // 7-DAY
-  const daily = document.getElementById("daily");
-  daily.innerHTML = "";
-  data.daily.slice(1, 8).forEach(d => {
-    const el = document.createElement("div");
-    el.className = "day";
-    el.innerHTML = `
-      <div>${new Date(d.dt * 1000).toLocaleDateString("en",{weekday:"short"})}</div>
-      <strong>${Math.round(d.temp.day)}°</strong>
-    `;
-    daily.appendChild(el);
-  });
-  document.getElementById("dailyBox").classList.remove("hidden");
-
-  // MAP (SAFE)
-  document.getElementById("map").src =
-    `https://maps.google.com/maps?q=${lat},${lon}&z=10&output=embed`;
-  document.getElementById("mapBox").classList.remove("hidden");
+  } catch (e) {
+    alert("Weather error");
+    console.error(e);
+  }
 }
 
-// 🔊 VOICE WEATHER
+function showWeather(d) {
+  weatherBox.classList.remove("hidden");
+  place.innerText = `${d.name}, ${d.sys.country}`;
+  temp.innerText = `${Math.round(d.main.temp)}°C`;
+  desc.innerText = d.weather[0].description;
+  extra.innerText = `Humidity ${d.main.humidity}% • Wind ${d.wind.speed} m/s`;
+
+  voiceBtn.onclick = () => speakWeather();
+}
+
 function speakWeather() {
-  const text =
-    `${place.innerText}. Temperature ${temp.innerText}. ${desc.innerText}`;
-  speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+  const msg = new SpeechSynthesisUtterance(
+    `${place.innerText}. Temperature ${temp.innerText}. ${desc.innerText}`
+  );
+  speechSynthesis.speak(msg);
 }
 
-// 📦 PWA INSTALL
-let deferredPrompt;
-window.addEventListener("beforeinstallprompt", e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  installBtn.classList.remove("hidden");
-});
+// 7 DAY FORECAST — NO API KEY
+async function loadForecast(lat, lon) {
+  forecast.innerHTML = "<h3>7-Day Forecast</h3>";
 
-installBtn.addEventListener("click", async () => {
-  deferredPrompt.prompt();
-  deferredPrompt = null;
-});
+  const res = await fetch(
+    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`
+  );
+  const data = await res.json();
 
-// SERVICE WORKER
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
+  data.daily.temperature_2m_max.forEach((t, i) => {
+    forecast.innerHTML += `
+      <div class="day">
+        Day ${i + 1}: ${t}° / ${data.daily.temperature_2m_min[i]}°
+      </div>`;
+  });
+}
+
+function loadMap(lat, lon) {
+  map.src = `https://www.openstreetmap.org/export/embed.html?bbox=${lon-0.1},${lat-0.1},${lon+0.1},${lat+0.1}&layer=mapnik&marker=${lat},${lon}`;
 }
