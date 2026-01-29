@@ -1,75 +1,95 @@
 const API_KEY = "fab9b6d2db473ddcfb43b90e080ca8ee";
 
+const cityInput = document.getElementById("cityInput");
 const searchBtn = document.getElementById("searchBtn");
 const locBtn = document.getElementById("locBtn");
-const voiceBtn = document.getElementById("voiceBtn");
 
-searchBtn.onclick = () => getCityWeather();
-locBtn.onclick = () => navigator.geolocation.getCurrentPosition(getGeoWeather);
+const placeName = document.getElementById("placeName");
+const tempEl = document.getElementById("temp");
+const descEl = document.getElementById("desc");
+const extraEl = document.getElementById("extra");
+const card = document.getElementById("weatherCard");
 
-async function getCityWeather() {
-  const city = cityInput.value.trim();
-  if (!city) return alert("Enter a city");
-  fetchWeather(`q=${city}`);
-}
+let map, marker;
 
-function getGeoWeather(pos) {
-  fetchWeather(`lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
-}
-
-async function fetchWeather(query) {
-  try {
-    const res = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?${query}&units=metric&appid=${API_KEY}`
-    );
-    const data = await res.json();
-
-    if (!data.main) throw "Invalid weather data";
-
-    showWeather(data);
-    loadForecast(data.coord.lat, data.coord.lon);
-    loadMap(data.coord.lat, data.coord.lon);
-
-  } catch (e) {
-    alert("Weather error");
-    console.error(e);
-  }
-}
-
-function showWeather(d) {
-  weatherBox.classList.remove("hidden");
-  place.innerText = `${d.name}, ${d.sys.country}`;
-  temp.innerText = `${Math.round(d.main.temp)}°C`;
-  desc.innerText = d.weather[0].description;
-  extra.innerText = `Humidity ${d.main.humidity}% • Wind ${d.wind.speed} m/s`;
-
-  voiceBtn.onclick = () => speakWeather();
-}
-
-function speakWeather() {
-  const msg = new SpeechSynthesisUtterance(
-    `${place.innerText}. Temperature ${temp.innerText}. ${desc.innerText}`
+searchBtn.onclick = () => searchByCity(cityInput.value);
+locBtn.onclick = () =>
+  navigator.geolocation.getCurrentPosition(p =>
+    searchByCoords(p.coords.latitude, p.coords.longitude)
   );
-  speechSynthesis.speak(msg);
-}
 
-// 7 DAY FORECAST — NO API KEY
-async function loadForecast(lat, lon) {
-  forecast.innerHTML = "<h3>7-Day Forecast</h3>";
+// 🌦 WEATHER BY CITY / AREA
+async function searchByCity(query) {
+  if (!query) return alert("Enter area or city");
 
-  const res = await fetch(
-    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`
-  );
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${query}&units=metric&appid=${API_KEY}`;
+  const res = await fetch(url);
   const data = await res.json();
 
-  data.daily.temperature_2m_max.forEach((t, i) => {
-    forecast.innerHTML += `
-      <div class="day">
-        Day ${i + 1}: ${t}° / ${data.daily.temperature_2m_min[i]}°
-      </div>`;
-  });
+  if (data.cod !== 200) return alert("Location not found");
+
+  renderWeather(data);
+  reverseGeocode(data.coord.lat, data.coord.lon);
+  loadMap(data.coord.lat, data.coord.lon);
 }
 
+// 📍 WEATHER BY LOCATION
+async function searchByCoords(lat, lon) {
+  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
+  const res = await fetch(url);
+  const data = await res.json();
+
+  renderWeather(data);
+  reverseGeocode(lat, lon);
+  loadMap(lat, lon);
+}
+
+// 🌍 AREA / LOCALITY FIX (IMPORTANT)
+async function reverseGeocode(lat, lon) {
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`
+  );
+  const data = await res.json();
+  const a = data.address || {};
+
+  const area =
+    a.suburb ||
+    a.neighbourhood ||
+    a.city_district ||
+    a.residential ||
+    a.village ||
+    "";
+
+  const city =
+    a.city ||
+    a.town ||
+    a.state_district ||
+    a.state ||
+    "";
+
+  const country = a.country || "";
+
+  placeName.textContent = [area, city, country].filter(Boolean).join(", ");
+}
+
+// 🧊 UI UPDATE
+function renderWeather(data) {
+  card.classList.remove("hidden");
+
+  tempEl.textContent = `${Math.round(data.main.temp)}°C`;
+  descEl.textContent = data.weather[0].description;
+  extraEl.textContent = `Humidity ${data.main.humidity}% • Wind ${data.wind.speed} m/s`;
+}
+
+// 🗺 MAP (SAFE, NEVER CRASHES)
 function loadMap(lat, lon) {
-  map.src = `https://www.openstreetmap.org/export/embed.html?bbox=${lon-0.1},${lat-0.1},${lon+0.1},${lat+0.1}&layer=mapnik&marker=${lat},${lon}`;
+  if (!map) {
+    map = L.map("map").setView([lat, lon], 12);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png")
+      .addTo(map);
+    marker = L.marker([lat, lon]).addTo(map);
+  } else {
+    map.setView([lat, lon], 12);
+    marker.setLatLng([lat, lon]);
+  }
 }
