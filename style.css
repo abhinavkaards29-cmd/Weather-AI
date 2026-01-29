@@ -28,6 +28,13 @@ body {
   transform: translateZ(0);
 }
 
+.section,
+.card,
+.weather-card {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
 h1 {
   text-align: center;
 }
@@ -68,10 +75,11 @@ button:hover {
 }
 
 #map {
-  height: 220px;
-  margin-top: 16px;
-  border-radius: 12px;
+  height: 260px;
+  border-radius: 14px;
   overflow: hidden;
+  transform: translateZ(0);
+  will-change: transform;
 }
 .fav-actions {
   margin-top: 10px;
@@ -117,3 +125,10 @@ button:hover {
   font-size: 14px;
   opacity: 0.9;
 }
+
+
+
+button:active {
+  transform: scale(0.97); box-shadow: 0 10px 20px rgba(0,0,0,0.35);
+}
+
