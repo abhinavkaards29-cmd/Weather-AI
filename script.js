@@ -1,73 +1,72 @@
-// 🔑 YOUR API KEY (OpenWeather)
 const API_KEY = "21c37b3cf3fc437adbbab13394d14186";
 
-// DOM
-const input = document.getElementById("cityInput");
+const cityInput = document.getElementById("cityInput");
 const searchBtn = document.getElementById("searchBtn");
 
-const currentBox = document.getElementById("current");
-const dailyBox = document.getElementById("daily");
+const current = document.getElementById("current");
+const daily = document.getElementById("daily");
 const mapBox = document.getElementById("mapBox");
 
-searchBtn.addEventListener("click", searchCity);
+const place = document.getElementById("place");
+const temp = document.getElementById("temp");
+const desc = document.getElementById("desc");
+const extra = document.getElementById("extra");
+const dailyList = document.getElementById("dailyList");
+const map = document.getElementById("map");
 
-// ✅ GLOBAL FUNCTION (THIS IS WHAT YOU WERE MISSING)
-function searchCity() {
-  const city = input.value.trim();
-  if (!city) return alert("Enter a city");
-  loadWeather(city);
+searchBtn.onclick = () => loadCity(cityInput.value);
+
+async function loadCity(city) {
+  if (!city) return;
+
+  const geo = await fetch(
+    `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${API_KEY}`
+  ).then(r => r.json());
+
+  if (!geo[0]) return alert("City not found");
+
+  const { lat, lon, name, country } = geo[0];
+
+  const data = await fetch(
+    `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
+  ).then(r => r.json());
+
+  // Current
+  place.textContent = `${name}, ${country}`;
+  temp.textContent = `${Math.round(data.current.temp)}°C`;
+  desc.textContent = data.current.weather[0].description;
+  extra.textContent = `Humidity ${data.current.humidity}% • Wind ${data.current.wind_speed} m/s`;
+
+  current.classList.remove("hidden");
+
+  // Daily
+  dailyList.innerHTML = "";
+  data.daily.slice(0, 7).forEach(d => {
+    const row = document.createElement("div");
+    row.innerHTML = `
+      <span>${new Date(d.dt * 1000).toDateString().slice(0, 10)}</span>
+      <span>${Math.round(d.temp.day)}°C</span>
+    `;
+    dailyList.appendChild(row);
+  });
+  daily.classList.remove("hidden");
+
+  // Map
+  map.src = `https://maps.google.com/maps?q=${lat},${lon}&z=10&output=embed`;
+  mapBox.classList.remove("hidden");
+
+  window.currentCity = name;
 }
 
-async function loadWeather(city) {
-  try {
-    // CURRENT
-    const res = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`
-    );
-    const data = await res.json();
+// Favourite
+document.getElementById("favBtn").onclick = () => {
+  localStorage.setItem("favCity", window.currentCity);
+  alert("Saved as favourite");
+};
 
-    if (data.cod !== 200) throw new Error("City not found");
-
-    const { lat, lon } = data.coord;
-
-    document.getElementById("place").textContent =
-      `${data.name}, ${data.sys.country}`;
-    document.getElementById("temp").textContent =
-      `${Math.round(data.main.temp)}°C`;
-    document.getElementById("desc").textContent =
-      data.weather[0].description;
-    document.getElementById("extra").textContent =
-      `Humidity ${data.main.humidity}% • Wind ${data.wind.speed} m/s`;
-
-    currentBox.classList.remove("hidden");
-
-    // MAP
-    document.getElementById("map").src =
-      `https://www.openstreetmap.org/export/embed.html?bbox=${lon-0.1}%2C${lat-0.1}%2C${lon+0.1}%2C${lat+0.1}&layer=mapnik&marker=${lat}%2C${lon}`;
-    mapBox.classList.remove("hidden");
-
-    // 7-DAY
-    const dailyRes = await fetch(
-      `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=metric&exclude=hourly,minutely&appid=${API_KEY}`
-    );
-    const dailyData = await dailyRes.json();
-
-    const list = document.getElementById("dailyList");
-    list.innerHTML = "";
-
-    dailyData.daily.slice(0, 7).forEach(day => {
-      const d = new Date(day.dt * 1000).toLocaleDateString();
-      list.innerHTML += `
-        <div>
-          <span>${d}</span>
-          <span>${Math.round(day.temp.max)}° / ${Math.round(day.temp.min)}°</span>
-        </div>
-      `;
-    });
-
-    dailyBox.style.display = "block";
-
-  } catch (err) {
-    alert(err.message);
-  }
-}
+// Reminder
+document.getElementById("remBtn").onclick = () => {
+  setTimeout(() => {
+    alert(`Weather reminder for ${window.currentCity}`);
+  }, 5000);
+};
