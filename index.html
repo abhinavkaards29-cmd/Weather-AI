@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Weather Glass</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+
+  <main class="glass">
+    <h1>☁️ Weather Glass</h1>
+
+    <input id="cityInput" placeholder="Search city" />
+    <button id="searchBtn">Search</button>
+
+    <!-- CURRENT -->
+    <section id="current" class="card hidden">
+      <h2 id="place"></h2>
+      <div id="temp"></div>
+      <p id="desc"></p>
+      <p id="extra"></p>
+    </section>
+
+    <!-- FORECAST -->
+    <section id="forecast" class="card hidden">
+      <h3>7-Day Forecast</h3>
+      <div id="days"></div>
+    </section>
+
+    <!-- MAP -->
+    <section id="mapBox" class="card hidden">
+      <h3>Location</h3>
+      <iframe id="map"></iframe>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
