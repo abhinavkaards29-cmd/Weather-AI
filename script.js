@@ -1,3 +1,4 @@
+document.addEventListener("DOMContentLoaded", () => {
 const API_KEY = "fab9b6d2db473ddcfb43b90e080ca8ee";
 
 const saveFavBtn = document.getElementById("saveFavBtn");
