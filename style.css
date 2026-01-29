@@ -56,3 +56,20 @@ button:hover {
   border-radius: 12px;
   overflow: hidden;
 }
+.fav-actions {
+  margin-top: 10px;
+}
+
+.favorites {
+  margin-top: 14px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.favorites button {
+  background: #334155;
+  border-radius: 20px;
+  padding: 8px 14px;
+  white-space: nowrap;
+}
