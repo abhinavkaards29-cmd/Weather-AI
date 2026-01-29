@@ -25,18 +25,45 @@ locBtn.onclick = () =>
   );
 
 // 🌦 WEATHER BY CITY / AREA
-async function searchByCity(query) {
-  if (!query) return alert("Enter area or city");
+async function searchCity() {
+  const input = document.getElementById("cityInput").value.trim();
+  if (!input) return alert("Enter city / area");
 
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${query}&units=metric&appid=${API_KEY}`;
+  try {
+    const loc = await getCoordinates(input);
+    fetchWeatherByCoords(loc.lat, loc.lon, loc);
+  } catch (err) {
+    alert("Area / city not found");
+  }
+}
+
+async function getCoordinates(place) {
+  const geoURL = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(place)}&limit=1&appid=${API_KEY}`;
+  const res = await fetch(geoURL);
+  const data = await res.json();
+
+  if (!data || data.length === 0) {
+    throw new Error("Location not found");
+  }
+
+  return {
+    lat: data[0].lat,
+    lon: data[0].lon,
+    name: data[0].name,
+    state: data[0].state || "",
+    country: data[0].country
+  };
+}
+
+// ADD WEATHER BY COORDS
+async function fetchWeatherByCoords(lat, lon, locationInfo) {
+  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
   const res = await fetch(url);
   const data = await res.json();
 
-  if (data.cod !== 200) return alert("Location not found");
+  if (data.cod !== 200) throw new Error("Weather error");
 
-  renderWeather(data);
-  reverseGeocode(data.coord.lat, data.coord.lon);
-  loadMap(data.coord.lat, data.coord.lon);
+  updateUI(data, locationInfo);
 }
 
 // 📍 WEATHER BY LOCATION
@@ -81,12 +108,23 @@ async function reverseGeocode(lat, lon) {
 }
 
 // 🧊 UI UPDATE
-function renderWeather(data) {
-  card.classList.remove("hidden");
+function updateUI(data, loc) {
+  document.getElementById("location").innerText =
+    `${loc.name}${loc.state ? ", " + loc.state : ""}, ${loc.country}`;
 
-  tempEl.textContent = `${Math.round(data.main.temp)}°C`;
-  descEl.textContent = data.weather[0].description;
-  extraEl.textContent = `Humidity ${data.main.humidity}% • Wind ${data.wind.speed} m/s`;
+  document.getElementById("temp").innerText =
+    Math.round(data.main.temp) + "°C";
+
+  document.getElementById("desc").innerText =
+    data.weather[0].description;
+
+  document.getElementById("humidity").innerText =
+    data.main.humidity + "%";
+
+  document.getElementById("wind").innerText =
+    data.wind.speed + " m/s";
+
+  updateMap(data.coord.lat, data.coord.lon);
 }
 
 // 🗺 MAP (SAFE, NEVER CRASHES)
